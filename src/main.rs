@@ -1,3 +1,7 @@
+
+extern crate target;
+
+#[cfg(not(test))]
 fn main() {
-    println!("Hello, world!")
+    println!("{}", target::is_anagram("Hello", "World!"))
 }
