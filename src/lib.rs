@@ -1,5 +1,44 @@
+use std::collections::TreeMap;
+
+// TODO: documentation!
+// TODO: Better brace / completion handling in emacs (paredit? yasnippet?)
+// TODO: Integration tests!
+
+// XXX: What's this &'a syntax I see everywhere?
+// e.g. fn iter(&'a self) -> Entries<'a, K, V>
+
+// XXX: How do I make this type signature not make promises about map
+// implementation?
+
+// XXX: I guess it's OK for the iterator to be mutable, since what else is
+// .next() going to do? Is there a way to express this with immutable
+// parameters?
+
+// XXX: Test it, yer bastard
+pub fn frequency<A: Ord, T: Iterator<A>>(sequence: &mut T) -> TreeMap<A, int> {
+    let mut map: TreeMap<A, int> = TreeMap::new();
+    for x in *sequence {
+        // XXX: Seems kind of crap to pop then insert.
+        let new_count =
+            match map.pop(&x) {
+                Some(i) => i + 1,
+                None    => 1,
+            };
+        map.insert(x, new_count);
+    }
+    map
+}
 
 pub fn is_anagram(first: &str, second: &str) -> bool {
+    let mut map: TreeMap<char, int> = TreeMap::new();
+    for c in first.chars() {
+        let new_count =
+            match map.pop(&c) {
+                Some(i) => i + 1,
+                None    => 1,
+            };
+        map.insert(c, new_count);
+    }
     first == second
 }
 
@@ -18,6 +57,12 @@ mod test {
     #[test]
     fn obvious_non_anagrams() {
         assert!(!(super::is_anagram("foo", "bar")));
+    }
+
+    #[test]
+    fn anagrams() {
+        assert!(super::is_anagram("foo", "ofo"));
+        assert!(super::is_anagram("foo", "oof"));
     }
 
 }
