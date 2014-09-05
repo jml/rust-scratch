@@ -68,4 +68,12 @@ mod test {
         assert_eq!(m, f);
     }
 
+    #[test]
+    fn single_frequency() {
+        let v:Vec<&str> = vec!["hello"];
+        let mut m: TreeMap<&str, int> = TreeMap::new();
+        m.insert("hello", 1);
+        let f: TreeMap<&&str, int> = super::frequency(&mut v.iter());
+        assert_eq!(m, f);
+    }
 }
