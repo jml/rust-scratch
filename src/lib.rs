@@ -43,6 +43,7 @@ pub fn is_anagram(first: &str, second: &str) -> bool {
 }
 
 mod test {
+    use std::collections::TreeMap;
 
     #[test]
     fn empty_anagram_of_empty() {
@@ -60,9 +61,11 @@ mod test {
     }
 
     #[test]
-    fn anagrams() {
-        assert!(super::is_anagram("foo", "ofo"));
-        assert!(super::is_anagram("foo", "oof"));
+    fn empty_frequency() {
+        let v:Vec<int> = vec![];
+        let m: TreeMap<&int, int> = TreeMap::new();
+        let f: TreeMap<&int, int> = super::frequency(&mut v.iter());
+        assert_eq!(m, f);
     }
 
 }
