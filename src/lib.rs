@@ -4,9 +4,6 @@ use std::collections::TreeMap;
 // TODO: Better brace / completion handling in emacs (paredit? yasnippet?)
 // TODO: Integration tests!
 
-// XXX: What's this &'a syntax I see everywhere?
-// e.g. fn iter(&'a self) -> Entries<'a, K, V>
-
 // XXX: How do I make this type signature not make promises about map
 // implementation?
 
