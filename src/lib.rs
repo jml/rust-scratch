@@ -1,6 +1,7 @@
 use std::collections::TreeMap;
 
-// TODO: documentation!
+// TODO: set up cargo documentation
+
 // TODO: Better brace / completion handling in emacs (paredit? yasnippet?)
 // TODO: Integration tests!
 
@@ -24,6 +25,34 @@ use std::collections::TreeMap;
 // XXX: Cloning all over the shop here. Is there a more sensible way to do this?
 
 // XXX: Untested (extracted from frequency)
+
+/// `accumulate` takes elements of a sequence and folds them into a map.
+///
+/// # Arguments
+///
+/// * `sequence` - A sequence of things that will become keys in the map.
+/// * `init` - The value stored for all keys when they are first inserted in
+///    the map.
+/// * `f` - A fold function that is applied to the value every time we see that
+///    key again.
+///
+/// # Returns
+///
+/// A map of elements in the sequences to results of the fold operation.
+///
+/// # Example
+///
+/// To count the number of times each element appears in a vector:
+///
+/// ```rust
+/// let some_vec = vec![1i, 1i, 2i, 1i, 1i, 2i, 3i];
+/// let counts = target::accumulate(&mut some_vec.iter(), 1i, |x, _| { x + 1i });
+/// assert_eq!(counts.find(&&some_vec[0]), Some(&4i));
+/// assert_eq!(counts.find(&&some_vec[2]), Some(&2i));
+/// assert_eq!(counts.find(&&some_vec[6]), Some(&1i));
+/// ```
+///
+/// Note that this is implemented as `frequency`.
 pub fn accumulate<K: Ord + Clone, A: Clone, T: Iterator<K>>(sequence: &mut T, init: A, f: |A, K| -> A) -> TreeMap<K, A> {
     let mut map: TreeMap<K, A> = TreeMap::new();
     for x in *sequence {
@@ -38,16 +67,57 @@ pub fn accumulate<K: Ord + Clone, A: Clone, T: Iterator<K>>(sequence: &mut T, in
     map
 }
 
+/// Count the number of times each element occurs in a sequence.
+///
+/// # Arguments
+///
+/// * `sequence` - A sequence of things to be counted.
+///
+/// # Returns
+///
+/// A map of elements in the sequence to the number of times they appear.
+///
+/// # Example
+///
+/// ```rust
+/// let some_vec = vec![1i, 1i, 2i, 1i, 1i, 2i, 3i];
+/// let counts = target::frequency(&mut some_vec.iter());
+/// assert_eq!(counts.find(&&some_vec[0]), Some(&4i));
+/// assert_eq!(counts.find(&&some_vec[2]), Some(&2i));
+/// assert_eq!(counts.find(&&some_vec[6]), Some(&1i));
+/// ```
 pub fn frequency<A: Ord + Clone, T: Iterator<A>>(sequence: &mut T) -> TreeMap<A, int> {
     accumulate(sequence, 1, |x, _| { x + 1i })
 }
 
 
+/// Count the number of times each letter occurs in a string.
+///
+/// # Arguments
+///
+/// * `word` - A string of letters to be counted.
+///
+/// # Returns
+///
+/// A map of characters in the string to the number of times they appear.
+///
+/// # Example
+///
+/// ```rust
+/// let some_str = "Hello";
+/// let counts = target::letter_counts(some_str);
+/// assert_eq!(counts.find(&'H'), Some(&1i));
+/// assert_eq!(counts.find(&'e'), Some(&1i));
+/// assert_eq!(counts.find(&'l'), Some(&2i));
+/// assert_eq!(counts.find(&'o'), Some(&1i));
+/// ```
 pub fn letter_counts(word: &str) -> TreeMap<char, int> {
     frequency(&mut word.chars())
 }
 
 
+// XXX: Could be made more generic: are two sequences 'anagrams' of each
+// other?
 pub fn is_anagram(first: &str, second: &str) -> bool {
     // XXX: This can be made faster (e.g. by escaping early when we detect
     // different lengths), but finish the program first.
@@ -55,6 +125,8 @@ pub fn is_anagram(first: &str, second: &str) -> bool {
 }
 
 
+// XXX: Could be made more generic: can the second sequence be found
+// rearranged in the first?
 pub fn is_sub_anagram(larger: &str, smaller: &str) -> bool {
     let mut frequencies = letter_counts(larger);
     for c in smaller.chars() {
