@@ -6,6 +6,16 @@ use std::collections::TreeMap;
 
 // XXX: How do I make this type signature not make promises about map
 // implementation?
+//
+// I guess I could make it a method in a trait, and then implement it
+// specifically for TreeMap, TrieMap, etc. But that's duplicating
+// implementation.
+//
+// I could also have it take the mapping as a mutable out-parameter. But
+// blergh.
+//
+// Also, different map structures have different constraints on key type.
+// e.g. K: Ord for TreeMap, K: Hash for HashMap [XXX: does rust have this?]
 
 // XXX: I guess it's OK for the iterator to be mutable, since what else is
 // .next() going to do? Is there a way to express this with immutable
@@ -14,9 +24,10 @@ use std::collections::TreeMap;
 // XXX: Cloning all over the shop here. Is there a more sensible way to do this?
 
 // XXX: Untested (extracted from frequency)
-pub fn accumulate<A: Ord + Clone, B: Clone, T: Iterator<A>>(sequence: &mut T, init: B, f: |B, A| -> B) -> TreeMap<A, B> {
-    let mut map: TreeMap<A, B> = TreeMap::new();
+pub fn accumulate<K: Ord + Clone, A: Clone, T: Iterator<K>>(sequence: &mut T, init: A, f: |A, K| -> A) -> TreeMap<K, A> {
+    let mut map: TreeMap<K, A> = TreeMap::new();
     for x in *sequence {
+        // XXX: Rather than pop & insert, just mutate the value in place
         let new_value =
             match map.pop(&x) {
                 Some(i) => f(i, x.clone()),
