@@ -14,20 +14,26 @@ use std::collections::TreeMap;
 // .next() going to do? Is there a way to express this with immutable
 // parameters?
 
-// XXX: Test it, yer bastard
-pub fn frequency<A: Ord, T: Iterator<A>>(sequence: &mut T) -> TreeMap<A, int> {
-    let mut map: TreeMap<A, int> = TreeMap::new();
+// XXX: Cloning all over the shop here. Is there a more sensible way to do this?
+
+// XXX: Untested (extracted from frequency)
+pub fn accumulate<A: Ord + Clone, B: Clone, T: Iterator<A>>(sequence: &mut T, init: B, f: |B, A| -> B) -> TreeMap<A, B> {
+    let mut map: TreeMap<A, B> = TreeMap::new();
     for x in *sequence {
-        // XXX: Seems kind of crap to pop then insert.
-        let new_count =
+        let new_value =
             match map.pop(&x) {
-                Some(i) => i + 1,
-                None    => 1,
+                Some(i) => f(i, x.clone()),
+                None    => init.clone(),
             };
-        map.insert(x, new_count);
+        map.insert(x, new_value);
     }
     map
 }
+
+pub fn frequency<A: Ord + Clone, T: Iterator<A>>(sequence: &mut T) -> TreeMap<A, int> {
+    accumulate(sequence, 1, |x, _| { x + 1i })
+}
+
 
 pub fn is_anagram(first: &str, second: &str) -> bool {
     let mut map: TreeMap<char, int> = TreeMap::new();
