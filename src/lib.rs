@@ -43,8 +43,27 @@ pub fn frequency<A: Ord + Clone, T: Iterator<A>>(sequence: &mut T) -> TreeMap<A,
 }
 
 
+pub fn letter_counts(word: &str) -> TreeMap<char, int> {
+    frequency(&mut word.chars())
+}
+
+
 pub fn is_anagram(first: &str, second: &str) -> bool {
-    frequency(&mut first.chars()) == frequency(&mut second.chars())
+    // XXX: This can be made faster (e.g. by escaping early when we detect
+    // different lengths), but finish the program first.
+    letter_counts(first) == letter_counts(second)
+}
+
+
+pub fn is_sub_anagram(larger: &str, smaller: &str) -> bool {
+    let mut frequencies = letter_counts(larger);
+    for c in smaller.chars() {
+        match frequencies.find_mut(&c) {
+            Some(x) => if *x >= 1i { *x -= 1i } else { return false },
+            None    => return false
+        }
+    }
+    true
 }
 
 
@@ -110,5 +129,25 @@ mod test {
         m.insert(' ', 1);
         let f: TreeMap<char, int> = super::frequency(&mut v.chars());
         assert_eq!(m, f);
+    }
+
+    #[test]
+    fn anagrams_are_subanagrams() {
+        assert!(super::is_sub_anagram("foo", "foo"));
+        assert!(super::is_sub_anagram("foo", "ofo"));
+        assert!(super::is_sub_anagram("foo", "oof"));
+    }
+
+    #[test]
+    fn actual_subanagrams() {
+        assert!(super::is_sub_anagram("target", "rag"));
+        assert!(super::is_sub_anagram("target", "rage"));
+        assert!(super::is_sub_anagram("target", "great"));
+    }
+
+    #[test]
+    fn non_subanagrams() {
+        assert!(!super::is_sub_anagram("target", "kennel"));
+        assert!(!super::is_sub_anagram("target", "targeter"));
     }
 }
