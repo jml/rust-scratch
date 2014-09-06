@@ -33,19 +33,13 @@ pub fn frequency<A: Ord + Clone, T: Iterator<A>>(sequence: &mut T) -> TreeMap<A,
 
 
 pub fn is_anagram(first: &str, second: &str) -> bool {
-    let mut map: TreeMap<char, int> = TreeMap::new();
-    for c in first.chars() {
-        let new_count =
-            match map.pop(&c) {
-                Some(i) => i + 1,
-                None    => 1,
-            };
-        map.insert(c, new_count);
-    }
-    first == second
+    frequency(&mut first.chars()) == frequency(&mut second.chars())
 }
 
+
 mod test {
+    // XXX: This gives a warning in 'cargo test', but if I delete it, my
+    // flycheck complains.
     use std::collections::TreeMap;
 
     #[test]
@@ -61,6 +55,17 @@ mod test {
     #[test]
     fn obvious_non_anagrams() {
         assert!(!(super::is_anagram("foo", "bar")));
+    }
+
+    #[test]
+    fn anagrams() {
+        assert!(super::is_anagram("foo", "ofo"));
+        assert!(super::is_anagram("foo", "oof"));
+    }
+
+    #[test]
+    fn non_anagrams() {
+        assert!(!super::is_anagram("foo", "ffoo"));
     }
 
     #[test]
