@@ -18,10 +18,6 @@ use std::collections::TreeMap;
 // Also, different map structures have different constraints on key type.
 // e.g. K: Ord for TreeMap, K: Hash for HashMap [XXX: does rust have this?]
 
-// XXX: I guess it's OK for the iterator to be mutable, since what else is
-// .next() going to do? Is there a way to express this with immutable
-// parameters?
-
 // XXX: Cloning all over the shop here. Is there a more sensible way to do this?
 
 // XXX: Untested (extracted from frequency)
