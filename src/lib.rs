@@ -71,9 +71,25 @@ mod test {
     #[test]
     fn single_frequency() {
         let v:Vec<&str> = vec!["hello"];
-        let mut m: TreeMap<&str, int> = TreeMap::new();
-        m.insert("hello", 1);
+        let mut m: TreeMap<&&str, int> = TreeMap::new();
+        m.insert(&v[0], 1);
         let f: TreeMap<&&str, int> = super::frequency(&mut v.iter());
+        assert_eq!(m, f);
+    }
+
+    #[test]
+    fn multiple_frequency() {
+        let v = "hello world";
+        let mut m: TreeMap<char, int> = TreeMap::new();
+        m.insert('h', 1);
+        m.insert('e', 1);
+        m.insert('l', 3);
+        m.insert('o', 2);
+        m.insert('w', 1);
+        m.insert('r', 1);
+        m.insert('d', 1);
+        m.insert(' ', 1);
+        let f: TreeMap<char, int> = super::frequency(&mut v.chars());
         assert_eq!(m, f);
     }
 }
