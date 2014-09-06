@@ -138,6 +138,19 @@ pub fn is_sub_anagram(larger: &str, smaller: &str) -> bool {
     true
 }
 
+/// A word matches the target word if it has the target character in it, is four or
+/// more letters long, and is a sub-anagram of the target word.
+pub fn matches_target(target_word: &str, target_char: char, candidate: &str) -> bool {
+    candidate.char_len() >= 4
+        && candidate.contains_char(target_char)
+        // XXX: we're going to be calling this a lot with the same
+        // target_word, which means that it will recalculate the frequency a
+        // lot. Instead, we probably want to calculate it just once, and
+        // either memcpy it (with current mutate-y algorithm) or build
+        // frequency for candidate and implement less-than.
+        && is_sub_anagram(target_word, candidate)
+}
+
 
 mod test {
     // XXX: This gives a warning in 'cargo test', but if I delete it, my
@@ -221,5 +234,25 @@ mod test {
     fn non_subanagrams() {
         assert!(!super::is_sub_anagram("target", "kennel"));
         assert!(!super::is_sub_anagram("target", "targeter"));
+    }
+
+    #[test]
+    fn matches_target_word() {
+        assert!(super::matches_target("target", 't', "great"));
+    }
+
+    #[test]
+    fn too_short_for_target() {
+        assert!(!super::matches_target("target", 't', "get"));
+    }
+
+    #[test]
+    fn target_char_not_present() {
+        assert!(!super::matches_target("target", 't', "rage"));
+    }
+
+    #[test]
+    fn not_subanagram_of_target() {
+        assert!(!super::matches_target("target", 't', "goat"));
     }
 }
