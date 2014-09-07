@@ -5,8 +5,8 @@ use std::collections::TreeMap;
 // TODO: Better brace / completion handling in emacs (paredit? yasnippet?)
 // TODO: Integration tests!
 
-// XXX: How do I make this type signature not make promises about map
-// implementation?
+// XXX: How do I make this type signature (accumulate) not make promises about
+// map implementation?
 //
 // I guess I could make it a method in a trait, and then implement it
 // specifically for TreeMap, TrieMap, etc. But that's duplicating
@@ -15,12 +15,9 @@ use std::collections::TreeMap;
 // I could also have it take the mapping as a mutable out-parameter. But
 // blergh.
 //
-// Also, different map structures have different constraints on key type.
-// e.g. K: Ord for TreeMap, K: Hash for HashMap [XXX: does rust have this?]
-
-// XXX: Cloning all over the shop here. Is there a more sensible way to do this?
-
-// XXX: Untested (extracted from frequency)
+// Also, different map structures have different constraints on key type (e.g.
+// K: Ord for TreeMap, K: Hash for HashMap) so I suspect it's flat-out
+// impossible. It's a shame because the algorithm is generic across them.
 
 /// `accumulate` takes elements of a sequence and folds them into a map.
 ///
@@ -50,6 +47,8 @@ use std::collections::TreeMap;
 ///
 /// Note that this is implemented as `frequency`.
 pub fn accumulate<K: Ord + Clone, A: Clone, T: Iterator<K>>(sequence: &mut T, init: A, f: |A, K| -> A) -> TreeMap<K, A> {
+    // XXX: Cloning all over the shop here. Is there a more sensible way to do this?
+    // XXX: Untested (extracted from frequency)
     let mut map: TreeMap<K, A> = TreeMap::new();
     for x in *sequence {
         // XXX: Rather than pop & insert, just mutate the value in place
@@ -146,6 +145,11 @@ pub fn matches_target(target_word: &str, target_char: char, candidate: &str) -> 
         // frequency for candidate and implement less-than.
         && is_sub_anagram(target_word, candidate)
 }
+
+
+//pub fn find_solutions<'a, T: Iterator<str>>(target_word: &'a str, target_char: char, candidates: T) -> Filter<'a, str, T> {
+//    candidates.filter(|x : &'a| { matches_target(target_word, target_char, x) })
+//}
 
 
 mod test {
